@@ -1,22 +1,29 @@
 const modals = () => {
+    let btnPressed = false;
     function bindModal(
         triggerSelector,
         modalSelector,
         closeSelector,
-        closeClickOverlay = true,
-        scroll = calcScroll()
+        destroy = false
     ) {
         const trigger = document.querySelectorAll(triggerSelector),
             modal = document.querySelector(modalSelector),
             close = document.querySelector(closeSelector),
-            windows = document.querySelectorAll('[data-modal]');
+            windows = document.querySelectorAll('[data-modal]'),
+            scroll = calcScroll();
         trigger.forEach((item) => {
             item.addEventListener('click', (e) => {
                 if (e.target) {
                     e.preventDefault();
                 }
+                btnPressed = true;
+                if (destroy) {
+                    item.remove();
+                }
+
                 windows.forEach((item) => {
                     item.style.display = 'none';
+                    item.classList.add('animated', 'fadeIn');
                 });
 
                 modal.style.display = 'block';
@@ -36,7 +43,7 @@ const modals = () => {
             //   document.body.classList.remove("modal-open");
         });
         modal.addEventListener('click', (e) => {
-            if (e.target === modal && closeClickOverlay) {
+            if (e.target === modal) {
                 windows.forEach((item) => {
                     item.style.display = 'none';
                 });
@@ -76,16 +83,38 @@ const modals = () => {
                 console.log('ddddddddddd');
                 document.querySelector(selector).style.display = 'block';
                 document.body.style.overflow = '';
+                let scroll = calcScroll();
+                document.body.style.marginRight = `${scroll}px`;
             }
         }, time);
     }
+
+    function openByScroll(selector) {
+        window.addEventListener('scroll', () => {
+            let scrollHeight = Math.max(
+                document.documentElement.scrollHeight,
+                document.body.scrollHeight
+            );
+            if (
+                !btnPressed &&
+                window.pageYOffset + document.documentElement.clientHeight >=
+                    scrollHeight
+            ) {
+                document.querySelector(selector).click();
+            }
+        });
+    }
+
     bindModal('.button-design', '.popup-design', '.popup-design .popup-close');
     bindModal(
         '.button-consultation',
         '.popup-consultation ',
         '.popup-consultation .popup-close'
     );
-    showModalByTime('.popup-consultation', 4000);
+
+    // showModalByTime('.popup-consultation', 4000);
+    bindModal('.fixed-gift', '.popup-gift', '.popup-gift .popup-close', true);
+    openByScroll('.fixed-gift');
     console.log('ddddddddddddd');
 };
 
