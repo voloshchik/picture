@@ -33,21 +33,22 @@ const forms = () => {
         inputs.forEach((item) => {
             item.value = '';
         });
+        upload.forEach((item) => {
+            item.previousElementSibling.textContent = 'Файл не выбран';
+        });
     };
 
     upload.forEach((item) => {
         item.addEventListener('input', () => {
             // console.log(item.files[0].name);
             let dots;
-            item.files[0].name.split('.')[0].length > 5
-                ? (dots = '...')
-                : (dots = '.');
+            const arr = item.files[0].name.split('.');
+            arr[0].length > 5 ? (dots = '...') : (dots = '.');
 
-            const name =
-                item.files[0].name.split('.')[0].substring(0, 6) +
-                dots +
-                item.files[0].name.split('.')[1];
+            const name = arr[0].substring(0, 6) + dots + arr[1];
             console.log('name', name);
+
+            item.previousElementSibling.textContent = name;
         });
     });
 
@@ -76,8 +77,7 @@ const forms = () => {
             const formData = new FormData(item);
             let api;
 
-            item.closest('.popup-design') ||
-            item.classList.contains('calc_form')
+            item.closest('.popup-design') || item.classList.contains('calc_form')
                 ? (api = path.designer)
                 : (api = path.question);
             console.log('api', api);
